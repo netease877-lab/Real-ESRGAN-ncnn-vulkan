@@ -67,7 +67,7 @@ jobs:
 
   macos:
     needs: [setup]
-    runs-on: macos-13
+    runs-on: macos-latest
     env:
       PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-macos
     steps:
@@ -101,14 +101,25 @@ jobs:
           ls -R vulkansdk
           exit 1
         fi
+        # Setup Intel Homebrew for x86_64 dependencies on ARM64 runner
+        if [ ! -f "/usr/local/bin/brew" ]; then
+          echo "Setting up Intel Homebrew..."
+          sudo mkdir -p /usr/local/Homebrew
+          sudo chown -R $(whoami) /usr/local/*
+          curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C /usr/local/Homebrew
+          sudo ln -s /usr/local/Homebrew/bin/brew /usr/local/bin/brew
+        fi
+        /usr/local/bin/brew install libomp
+        ITL_OMP_PREFIX=$(/usr/local/bin/brew --prefix libomp)
+
         echo "Detected Vulkan SDK at: $VULKAN_SDK"
         mkdir build-x86_64 && cd build-x86_64
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="x86_64" \
-            -DOpenMP_C_FLAGS="-Xclang -fopenmp -I$(brew --prefix libomp)/include" \
-            -DOpenMP_CXX_FLAGS="-Xclang -fopenmp -I$(brew --prefix libomp)/include" \
-            -DCMAKE_EXE_LINKER_FLAGS="-L$(brew --prefix libomp)/lib -lomp" \
+            -DOpenMP_C_FLAGS="-Xclang -fopenmp -I$ITL_OMP_PREFIX/include" \
+            -DOpenMP_CXX_FLAGS="-Xclang -fopenmp -I$ITL_OMP_PREFIX/include" \
+            -DCMAKE_EXE_LINKER_FLAGS="-L$ITL_OMP_PREFIX/lib -lomp" \
             -DOpenMP_C_LIB_NAMES="libomp" -DOpenMP_CXX_LIB_NAMES="libomp" \
-            -DOpenMP_libomp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
+            -DOpenMP_libomp_LIBRARY="$ITL_OMP_PREFIX/lib/libomp.a" \
             -DVulkan_INCLUDE_DIR=$VULKAN_SDK/include \
             -DVulkan_LIBRARY=$VULKAN_SDK/lib/libvulkan.dylib \
             ../src
