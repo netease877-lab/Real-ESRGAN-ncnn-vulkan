@@ -69,11 +69,9 @@ jobs:
         git submodule update --init --recursive
     - name: vulkansdk
       run: |
-        wget -q https://sdk.lunarg.com/sdk/download/latest/mac/vulkan-sdk.dmg -O vulkan-sdk.dmg
-        hdiutil attach vulkan-sdk.dmg
-        MOUNT_POINT=$(ls -d /Volumes/vulkansdk-macos-* | head -1)
-        cp -r "$MOUNT_POINT" vulkansdk
-        hdiutil detach "$MOUNT_POINT"
+        wget -q https://sdk.lunarg.com/sdk/download/latest/mac/vulkan-sdk.zip -O vulkan-sdk.zip
+        unzip -q vulkan-sdk.zip
+        mv vulkansdk-macos-* vulkansdk
     - name: build-x86_64
       run: |
         export VULKAN_SDK=`pwd`/vulkansdk/macOS
