@@ -71,14 +71,9 @@ jobs:
       run: |
         wget -q https://sdk.lunarg.com/sdk/download/latest/mac/vulkan-sdk.zip -O vulkan-sdk.zip
         unzip -q vulkan-sdk.zip -d temp_sdk
-        echo "Listing temp_sdk content:"
-        ls -R temp_sdk
-        mkdir vulkansdk
-        if [ $(ls temp_sdk | wc -l) -eq 1 ]; then
-          mv temp_sdk/*/* vulkansdk/
-        else
-          mv temp_sdk/* vulkansdk/
-        fi
+        INSTALLER=$(find temp_sdk -name "vulkansdk-macOS*" -path "*/Contents/MacOS/*" -type f | head -n 1)
+        chmod +x "$INSTALLER"
+        "$INSTALLER" --root $(pwd)/vulkansdk --accept-licenses --default-answer --confirm-command install
         rm -rf temp_sdk
     - name: build-x86_64
       run: |
