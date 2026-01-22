@@ -32,6 +32,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: update-ncnn
+      run: |
+        cd src/ncnn
+        git checkout master
+        git pull origin master
     - name: cache-vulkansdk
       id: cache-vulkansdk
       uses: actions/cache@v1
@@ -130,6 +135,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: update-ncnn
+      run: |
+        cd src/ncnn
+        git checkout master
+        git pull origin master
     - name: download-openmp-macos
       uses: actions/download-artifact@v2
       with:
@@ -202,6 +212,11 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: 'recursive'
+    - name: update-ncnn
+      run: |
+        cd src/ncnn
+        git checkout master
+        git pull origin master
     - name: cache-vulkansdk
       id: cache-vulkansdk
       uses: actions/cache@v1
