@@ -106,6 +106,7 @@ jobs:
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="x86_64" \
             -DOpenMP_C_FLAGS="-Xclang -fopenmp -I$(brew --prefix libomp)/include" \
             -DOpenMP_CXX_FLAGS="-Xclang -fopenmp -I$(brew --prefix libomp)/include" \
+            -DCMAKE_EXE_LINKER_FLAGS="$(brew --prefix libomp)/lib/libomp.a" \
             -DOpenMP_C_LIB_NAMES="libomp" -DOpenMP_CXX_LIB_NAMES="libomp" \
             -DOpenMP_libomp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
             -DVulkan_INCLUDE_DIR=$VULKAN_SDK/include \
@@ -126,6 +127,7 @@ jobs:
             -DCMAKE_CROSSCOMPILING=ON -DCMAKE_SYSTEM_PROCESSOR=arm64 \
             -DOpenMP_C_FLAGS="-Xclang -fopenmp -I$(brew --prefix libomp)/include" \
             -DOpenMP_CXX_FLAGS="-Xclang -fopenmp -I$(brew --prefix libomp)/include" \
+            -DCMAKE_EXE_LINKER_FLAGS="$(brew --prefix libomp)/lib/libomp.a" \
             -DOpenMP_libomp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
              -DVulkan_INCLUDE_DIR=$VULKAN_SDK/include \
             -DVulkan_LIBRARY=$VULKAN_SDK/lib/libvulkan.dylib \
