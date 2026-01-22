@@ -90,22 +90,25 @@ jobs:
         INSTALLER=$(find temp_sdk -name "vulkansdk-macOS*" -path "*/Contents/MacOS/*" -type f | head -n 1)
         chmod +x "$INSTALLER"
         "$INSTALLER" --root $(pwd)/vulkansdk --accept-licenses --default-answer --confirm-command install
-        echo "Listing installed vulkansdk content:"
-        ls -R vulkansdk
+        echo "Installing Vulkan SDK..."
         rm -rf temp_sdk
     - name: build-x86_64
       run: |
-        VULKAN_BIN=$(find vulkansdk -name glslangValidator -type f | head -n 1)
-        if [ -z "$VULKAN_BIN" ]; then echo "glslangValidator not found!"; exit 1; fi
-        export VULKAN_SDK=$(dirname $(dirname $VULKAN_BIN))
+        export VULKAN_SDK=$(pwd)/vulkansdk/macOS
+        echo "Vulkan SDK Root: $VULKAN_SDK"
+        if [ ! -f "$VULKAN_SDK/bin/glslangValidator" ]; then
+          echo "glslangValidator not found at expected path: $VULKAN_SDK/bin/glslangValidator"
+          ls -R vulkansdk
+          exit 1
+        fi
         echo "Detected Vulkan SDK at: $VULKAN_SDK"
         mkdir build-x86_64 && cd build-x86_64
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="x86_64" \
             -DOpenMP_C_FLAGS="-Xclang -fopenmp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp" \
             -DOpenMP_C_LIB_NAMES="libomp" -DOpenMP_CXX_LIB_NAMES="libomp" \
             -DOpenMP_libomp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
-            -DVulkan_INCLUDE_DIR=`pwd`/../vulkansdk/MoltenVK/include \
-            -DVulkan_LIBRARY=`pwd`/../vulkansdk/MoltenVK/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a \
+            -DVulkan_INCLUDE_DIR=$VULKAN_SDK/include \
+            -DVulkan_LIBRARY=$VULKAN_SDK/lib/libvulkan.dylib \
             ../src
         cmake --build . -j $(sysctl -n hw.ncpu)
     - name: build-arm64
