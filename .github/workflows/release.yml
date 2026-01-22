@@ -67,7 +67,7 @@ jobs:
 
   macos:
     needs: [setup]
-    runs-on: macos-13
+    runs-on: macos-latest
     env:
       PACKAGENAME: ${{ needs.setup.outputs.APPNAME }}-${{ needs.setup.outputs.VERSION }}-macos
     steps:
