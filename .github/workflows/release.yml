@@ -96,7 +96,10 @@ jobs:
         rm -rf temp_sdk
     - name: build-x86_64
       run: |
-        export VULKAN_SDK=`pwd`/vulkansdk/macOS
+        VULKAN_BIN=$(find vulkansdk -name glslangValidator -type f | head -n 1)
+        if [ -z "$VULKAN_BIN" ]; then echo "glslangValidator not found!"; exit 1; fi
+        export VULKAN_SDK=$(dirname $(dirname $VULKAN_BIN))
+        echo "Detected Vulkan SDK at: $VULKAN_SDK"
         mkdir build-x86_64 && cd build-x86_64
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="x86_64" \
             -DOpenMP_C_FLAGS="-Xclang -fopenmp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp" \
@@ -108,7 +111,10 @@ jobs:
         cmake --build . -j $(sysctl -n hw.ncpu)
     - name: build-arm64
       run: |
-        export VULKAN_SDK=`pwd`/vulkansdk/macOS
+        VULKAN_BIN=$(find vulkansdk -name glslangValidator -type f | head -n 1)
+        if [ -z "$VULKAN_BIN" ]; then echo "glslangValidator not found!"; exit 1; fi
+        export VULKAN_SDK=$(dirname $(dirname $VULKAN_BIN))
+        echo "Detected Vulkan SDK at: $VULKAN_SDK"
         mkdir build-arm64 && cd build-arm64
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="arm64" \
             -DCMAKE_CROSSCOMPILING=ON -DCMAKE_SYSTEM_PROCESSOR=arm64 \
