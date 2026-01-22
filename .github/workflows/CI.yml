@@ -74,6 +74,8 @@ jobs:
         INSTALLER=$(find temp_sdk -name "vulkansdk-macOS*" -path "*/Contents/MacOS/*" -type f | head -n 1)
         chmod +x "$INSTALLER"
         "$INSTALLER" --root $(pwd)/vulkansdk --accept-licenses --default-answer --confirm-command install
+        echo "Listing installed vulkansdk content:"
+        ls -R vulkansdk
         rm -rf temp_sdk
     - name: build-x86_64
       run: |
