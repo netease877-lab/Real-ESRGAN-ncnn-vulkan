@@ -113,9 +113,12 @@ jobs:
         cmake --build . -j $(sysctl -n hw.ncpu)
     - name: build-arm64
       run: |
-        VULKAN_BIN=$(find vulkansdk -name glslangValidator -type f | head -n 1)
-        if [ -z "$VULKAN_BIN" ]; then echo "glslangValidator not found!"; exit 1; fi
-        export VULKAN_SDK=$(dirname $(dirname $VULKAN_BIN))
+        export VULKAN_SDK=$(pwd)/vulkansdk/macOS
+        echo "Vulkan SDK Root: $VULKAN_SDK"
+        if [ ! -f "$VULKAN_SDK/bin/glslangValidator" ]; then
+          echo "glslangValidator not found!"
+          exit 1
+        fi
         echo "Detected Vulkan SDK at: $VULKAN_SDK"
         mkdir build-arm64 && cd build-arm64
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="arm64" \
@@ -123,8 +126,8 @@ jobs:
             -DOpenMP_C_FLAGS="-Xclang -fopenmp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp" \
             -DOpenMP_C_LIB_NAMES="libomp" -DOpenMP_CXX_LIB_NAMES="libomp" \
             -DOpenMP_libomp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
-            -DVulkan_INCLUDE_DIR=`pwd`/../vulkansdk/MoltenVK/include \
-            -DVulkan_LIBRARY=`pwd`/../vulkansdk/MoltenVK/MoltenVK.xcframework/macos-arm64_x86_64/libMoltenVK.a \
+             -DVulkan_INCLUDE_DIR=$VULKAN_SDK/include \
+            -DVulkan_LIBRARY=$VULKAN_SDK/lib/libvulkan.dylib \
             ../src
         cmake --build . -j $(sysctl -n hw.ncpu)
     - name: package
