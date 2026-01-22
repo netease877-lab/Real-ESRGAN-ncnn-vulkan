@@ -31,11 +31,16 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: 'recursive'
+    - name: install-deps
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-dev libvulkan-dev
     - name: update-ncnn
       run: |
         cd src/ncnn
         git checkout master
         git pull origin master
+        git submodule update --init --recursive
     - name: vulkansdk
       run: |
         wget -q https://sdk.lunarg.com/sdk/download/latest/linux/vulkan-sdk.tar.xz -O vulkan-sdk.tar.xz
@@ -74,6 +79,7 @@ jobs:
         cd src/ncnn
         git checkout master
         git pull origin master
+        git submodule update --init --recursive
     - name: install-openmp
       run: |
         brew install libomp
@@ -136,10 +142,13 @@ jobs:
         cd src/ncnn
         git checkout master
         git pull origin master
+        git submodule update --init --recursive
     - name: vulkansdk
       run: |
         Invoke-WebRequest -Uri https://sdk.lunarg.com/sdk/download/latest/windows/vulkan-sdk.exe -OutFile vulkan-sdk.exe
-        7z x -aoa ./vulkan-sdk.exe -oVulkanSDK
+        $installer = ".\vulkan-sdk.exe"
+        $args = @("--root", "$($PWD)\VulkanSDK", "--accept-licenses", "--default-answer", "--confirm-command", "install")
+        Start-Process -FilePath $installer -ArgumentList $args -Wait
     - name: build
       run: |
         $env:VULKAN_SDK="$(pwd)/VulkanSDK"
