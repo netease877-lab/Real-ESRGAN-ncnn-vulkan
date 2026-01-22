@@ -88,6 +88,9 @@ jobs:
         echo "Detected Vulkan SDK at: $VULKAN_SDK"
         mkdir build-x86_64 && cd build-x86_64
         cmake -DUSE_STATIC_MOLTENVK=ON -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+            -DOpenMP_C_FLAGS="-Xclang -fopenmp" -DOpenMP_CXX_FLAGS="-Xclang -fopenmp" \
+            -DOpenMP_C_LIB_NAMES="libomp" -DOpenMP_CXX_LIB_NAMES="libomp" \
+            -DOpenMP_libomp_LIBRARY="$(brew --prefix libomp)/lib/libomp.a" \
             -DVulkan_INCLUDE_DIR=$VULKAN_SDK/include \
             -DVulkan_LIBRARY=$VULKAN_SDK/lib/libvulkan.dylib \
             ../src
