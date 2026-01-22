@@ -224,7 +224,7 @@ if(NOT USE_SYSTEM_NCNN)
     option(WITH_LAYER_swish "" OFF)
     option(WITH_LAYER_gemm "" OFF)
     option(WITH_LAYER_groupnorm "" OFF)
-    option(WITH_LAYER_layernorm "" OFF)
+    option(WITH_LAYER_layernorm "" ON)
     option(WITH_LAYER_softplus "" OFF)
 
     add_subdirectory(ncnn)
